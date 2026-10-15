@@ -211,7 +211,8 @@ else:
     var = "t" if advanced else "x"
     st.divider()
     st.subheader("02 · Investigate your problem")
-    st.markdown(f"<span class='level-chip'>{level.upper()} · {"AI-GENERATED" if api_key else "DEMO PRACTICE"}</span>", unsafe_allow_html=True)
+    mode_label = "AI-GENERATED" if api_key else "DEMO PRACTICE"
+    st.markdown(f"<span class='level-chip'>{level.upper()} · {mode_label}</span>", unsafe_allow_html=True)
     st.markdown(f"### {exercise.title}")
     st.write(exercise.context)
     st.latex(("h(t)" if advanced else "f(x)") + "=" + terms(q.a, q.b, q.c, symbol=var))
