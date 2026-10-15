@@ -1,84 +1,53 @@
-# GraphMind AI — Functions & Graphs
+# GraphMind AI — Grade 9 Functions & Graphs
 
-An interactive **Grade 9 AI Math Differentiator** built using **Python + Streamlit + OpenAI API**.
+Live site: https://graphmind-ai-bbbb06m.streamlit.app
 
-## What the app does
+An interactive Streamlit math differentiator with **Google Gemini AI**, optional OpenAI support and **API-free Demo mode**.
 
-Every learner studies **one core mathematical task**: analyze a quadratic graph and find its vertex and opening direction. OpenAI dynamically creates a problem appropriate to one of three difficulty levels:
+The same central skill is practised at three difficulties: identify the vertex of a quadratic function and its opening direction.
 
-| Level | Differentiation | Support |
-|---|---|---|
-| **Foundation** | `f(x) = ±x² + c` | Simple graph translations; direct, gradual hints |
-| **Standard** | `f(x) = ax² + bx + c` | The vertex formula and grade-level independent solving |
-| **Advanced** | `h(t) = at² + bt + c` | Real-world ball-height model: maximum height and time |
+- **Foundation:** f(x) = ±x² + c, direct hints and simple transformations.
+- **Standard:** f(x) = ax² + bx + c, use x = -b/(2a).
+- **Advanced:** h(t) = at² + bt + c, interpret the ball's maximum height and its time.
 
-Students can generate a fresh task, explore an interactive Plotly graph, request two **AI-generated level-specific hints**, enter three answers, obtain automatic marking and AI feedback, and reveal a **verified step-by-step solution**.
+Learners can generate new problems, interact with a Plotly graph, reveal two progressive hints, submit answers, receive differentiated feedback, and see a Python-verified solution.
 
-**Important design decision:** The AI generates activities and guidance; Python checks coefficient bounds, computes the exact mathematical answer with `Fraction`, creates the graph, and grades students. This reduces the risk of unreliable model-produced mathematics.
+## Enable Gemini AI
 
-## Repository contents
+1. Visit https://aistudio.google.com/apikey and create a Gemini API key. A free tier may be available, subject to model, region, quota and account eligibility.
+2. Open the app at https://share.streamlit.io, select your app, then **Settings → Secrets**.
+3. Save private TOML values (do NOT put actual secrets in GitHub):
 
-```text
-GraphMind_AI/
-  app.py                     # Streamlit UI and interactive graph
-  ai_engine.py               # OpenAI generation + feedback
-  math_engine.py             # Verified numerical logic
-  requirements.txt           # Install dependencies
-  .streamlit/config.toml     # Visual theme
-  .streamlit/secrets.example.toml # Example ONLY, not a real key
-  .gitignore                 # Protect private files
-  tests/                     # Offline automated tests
-  DEPLOY_KZ.md               # Detailed Kazakh deployment instructions
-  REPORT.md                  # One-page report in English
+```toml
+GEMINI_API_KEY = "paste-your-real-key-here"
+GEMINI_MODEL = "gemini-2.5-flash-lite"
 ```
 
-## Run locally
+4. Reboot the app if prompted, and check that its sidebar says **Gemini AI is configured**.
+5. Select a level and generate a new AI problem. Verify all three levels, hints and feedback.
 
-1. Install **Python 3.11+**.
-2. Download this repository and open a terminal in its folder.
-3. Create an optional virtual environment: `python -m venv .venv` and activate it.
-4. Install: `python -m pip install -r requirements.txt`.
-5. Create a file called `.streamlit/secrets.toml` (**do not commit**):
+**Provider choice:** Gemini takes priority when GEMINI_API_KEY is configured. If there is no Gemini key, OpenAI is used when OPENAI_API_KEY exists. Otherwise the app automatically works in labelled **Demo mode**. Demo uses Python rules, not AI, and does **not** satisfy the assignment's AI integration requirement.
 
-   ```toml
-   OPENAI_API_KEY = "your-private-key"
-   OPENAI_MODEL = "gpt-5-mini"
-   ```
+Math answers, graph data and correctness checking are calculated independently in `math_engine.py` using exact fractions. AI writes the task context, coefficients, progressive hints and level-specific feedback. Generated coefficients are checked against curriculum limits before display.
 
-6. Launch: `python -m streamlit run app.py`.
-7. Open the local address Streamlit displays, usually `http://localhost:8501`.
+## Local launch
 
-## Publish to Streamlit Community Cloud
+```bash
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
 
-1. Upload **all project files except `.streamlit/secrets.toml`** to a **public GitHub repository**.
-2. Go to <https://share.streamlit.io>, sign in with GitHub, then choose **Create app**.
-3. Set repository/branch and entrypoint file `app.py`.
-4. In **Advanced settings → Secrets**, paste your **real** key using the TOML layout above; the private secret is stored with Streamlit, not in GitHub.
-5. Click **Deploy** and copy the resulting public `https://....streamlit.app` URL.
-6. Check all three levels live, then submit the live URL, your GitHub link, and the report.
+For private local setup use `.streamlit/secrets.toml` (gitignored). Never commit keys. Cloud usage limits and billing are controlled by the provider, not by this application. For a publicly available app, be careful with quotas and permissions.
 
-The hosting service can change its menus. For current setup, see <https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy>.
+## Project structure
 
-## Automated tests
+- `app.py`: Streamlit interactive application
+- `gemini_engine.py`: Google Gemini API integration
+- `ai_engine.py`: optional OpenAI API adapter and shared structured exercise schema
+- `demo_engine.py`: offline non-AI fallback
+- `math_engine.py`: verified quadratic functions and grading
+- `.streamlit/config.toml`: theme settings
+- `requirements.txt`: dependencies
+- `REPORT.md`: assignment report draft (revise with your own name and verified findings)
 
-Install development test dependency `python -m pip install pytest` then run `python -m pytest -q`.
-Tests do **not** need an API key and use fake responses instead of contacting OpenAI. Verify live API behavior yourself after adding a valid key.
-
-## Privacy, safety and costs
-
-- The **OpenAI API is billed separately** from ChatGPT subscriptions. You need valid API access/billing; requests are not guaranteed to be free.
-- API keys must only live in local private secrets or Streamlit Cloud secrets; **never in GitHub**.
-- A publicly accessible app using your server-side key may consume your account's API quota. Set an appropriate spend/usage limit in the OpenAI dashboard and monitor usage.
-- Do not send pupils' names or personal data to the AI; this prototype sends only the exercise level, coefficients and correctness flags.
-- The AI is a teaching tool: evaluate generated hints and mathematics with teacher review before classroom use.
-
-## Academic originality
-
-The assignment specifies original design, prompts and report. Before submission, review the code, try all levels, customize the explanations/layout as your own work, check mathematical correctness, and be ready to explain how you developed and verified the app. Do not misrepresent unaudited generated material as independently authored.
-
-## References
-
-- OpenAI Python Responses API: <https://developers.openai.com/api/reference/python>
-- OpenAI Structured Outputs: <https://developers.openai.com/api/docs/guides/structured-outputs>
-- Streamlit deployment: <https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy>
-- Streamlit secrets: <https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management>
+This is an educational prototype; review AI-generated questions before classroom use. 
